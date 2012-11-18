@@ -17,6 +17,7 @@
 
 struct cdata_t {
 	char	data[1024];
+	int 	index;
 }
 
 static int cdata_open(struct inode *inode, struct file *filp)
@@ -26,6 +27,7 @@ static int cdata_open(struct inode *inode, struct file *filp)
 	struct cdata_t *cdata;
 
 	cdata =  (struct cdata_t*)kmalloc(sizeof(struct cdata_t), GFP_KERNEL);
+	cdata->index = 0;
 	filp->private_data = (void *)data;
 	return 0;
 }
