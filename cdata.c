@@ -70,8 +70,11 @@ static ssize_t cdata_write(struct file *filp, const char *buf,
 	for(i = 0; i < count; i++) {
 	  if(cdata->index >= BUFSIZE)					 
 		current->state = TASK_UNINTERRUPTIBLE;			//Refernece OS page 103 figure 3.2 
-		schedule();						  
+		schedule();
 
+		//current->state = RUNNING;				//Incorrect.If run here that means so one 						  
+                                                                        //already change state to RUNNING first then
+									//back to here. 
   	  if(copy_from_user(&cdata->data[cdata->index++], &buf[i], 1))  //Write data from user space to kernel space.
 		return -EFAULT;
 	}
