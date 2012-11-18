@@ -1,0 +1,33 @@
+11/17
+//For module part(cdata.c).
+Make(to create xx.ko/xx.mod.c/xx.mod.o/xx.o from cdata.c)在cdata-011 folder執行make
+sudo insmod ./cdata.ko 
+sudo mknod /dev/cdata c 121 0(to open "dev/cdata" ==>crw-r--r--  1 root root    121,   0 2012-11-17 22:34 cdata)
+sudo rmmod cdata(module name)
+//For test part(test.c).
+create test.c
+gcc -o firstprogram firstprogram.c 
+sudo ./test
+dmesg:kernal message
+
+11/18
+@Create a new repository on the command line
+touch README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/JCWu/cdata-jc.git
+git push -u origin master
+
+@Push an existing repository from the command line
+git remote add origin https://github.com/JCWu/cdata-jc.git
+git push -u origin master
+
+Or:
+
+
+
+
+
+
+
