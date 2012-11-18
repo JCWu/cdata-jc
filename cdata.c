@@ -17,7 +17,7 @@
 static int cdata_open(struct inode *inode, struct file *filp)
 {
 	printk(KERN_ALERT "cdata: in cdata_open()\n");
-
+	printk(KERN_ALERT "The value of flip =[%d]\n", filp);
 	return 0;
 }
 

@@ -6,9 +6,12 @@
 int main(void)
 {
 	int fd;
+	pid_t fpid;
+
+	fpid=fork();
 
 	fd = open("/dev/cdata", O_RDWR);
-	ioctl(fd, IOCTL_EMPTY, 0);
-	ioctl(fd, IOCTL_SYNC, 0);
+	//ioctl(fd, IOCTL_EMPTY, 0);
+	//ioctl(fd, IOCTL_SYNC, 0);
 	close(fd);
 }
