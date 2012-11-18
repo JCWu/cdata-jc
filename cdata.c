@@ -8,17 +8,19 @@
 #include <asm/io.h>
 #include "cdata_ioctl.h"
 #include <linux/slab.h> 
+#include <asm/uaccess.h>
 
 #ifdef CONFIG_SMP
 #define __SMP__
 #endif
 
 #define	CDATA_MAJOR 121 
+#define BUFSIZE 1024
 
 struct cdata_t {
-	char	data[1024];
+	char	data[BUFSIZE];
 	int 	index;
-}
+};
 
 static int cdata_open(struct inode *inode, struct file *filp)
 {
@@ -26,9 +28,9 @@ static int cdata_open(struct inode *inode, struct file *filp)
 
 	struct cdata_t *cdata;
 
-	cdata =  (struct cdata_t*)kmalloc(sizeof(struct cdata_t), GFP_KERNEL);
+	cdata =  kmalloc(sizeof(struct cdata_t), GFP_KERNEL);
 	cdata->index = 0;
-	filp->private_data = (void *)data;
+	filp->private_data = (void *)cdata;
 	return 0;
 }
 
@@ -41,15 +43,11 @@ static int cdata_ioctl(struct inode *inode, struct file *filp,
 	  int i;
 	  case IOCTL_EMPTY:
 	  printk(KERN_ALERT "in ioctl:IOCTL_EMPTY\n");
-	  for(i = 0; i< 1024; i++)	
-	  	data[0] = "0"; 	
+
 	  return 0;
 	  case IOCTL_SYNC:
 	  printk(KERN_ALERT "in ioctl:IOCTL_SYNC\n");
-	  for(i = 0; i< 1024; i++)	
-	  {	
-		printk(KERN_ALERT "The data[%d] = (%s)\n",i, data[i]);
-	  }
+
 	  return 0;
 	  default:
           return -ENOTTY; 		
@@ -63,13 +61,19 @@ static ssize_t cdata_read(struct file *filp, char *buf,
 }
 
 static ssize_t cdata_write(struct file *filp, const char *buf, 
-				size_t size, loff_t *off)
+				size_t count, loff_t *off)
 {
 	printk(KERN_ALERT "cdata_write: %s\n", buf);
 	int i;
+	struct cdata_t *cdata = (struct cdata_t *)filp->private_data;
 
-	for(i = 0; i< size; i++)	
-	  	data[i] = buf[i];
+	for(i = 0; i < count; i++) {
+	  if(cdata->index >= BUFSIZE)
+		return -EFAULT;
+
+  	  if(copy_from_user(&cdata->data[cdata->index++], &buf[i], 1)) //Write data from user space to kernel space.
+		return -EFAULT;
+	}
 	return 0;
 }
 
