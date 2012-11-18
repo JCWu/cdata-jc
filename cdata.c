@@ -64,16 +64,18 @@ static ssize_t cdata_write(struct file *filp, const char *buf,
 {
 	printk(KERN_ALERT "cdata_write: %s\n", buf);
 	int i;
+	//Mutex_lock to fix reentrancy problem.
 	struct cdata_t *cdata = (struct cdata_t *)filp->private_data;
 
 	for(i = 0; i < count; i++) {
-	  if(cdata->index >= BUFSIZE)					//If open(p1 and p2 get the same fd) then write it could be reentrancy 
-									//else will not reentrancy for mulitprocesses(SMP).
-		return -EFAULT;						//If single process it will not cause eentrancy problem. 
+	  if(cdata->index >= BUFSIZE)					 
+		current->state = TASK_UNINTERRUPTIBLE;			//Refernece OS page 103 figure 3.2 
+		schedule();						  
 
   	  if(copy_from_user(&cdata->data[cdata->index++], &buf[i], 1))  //Write data from user space to kernel space.
 		return -EFAULT;
 	}
+	//Mutex_unlock
 	return 0;
 }
 
