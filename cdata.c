@@ -29,10 +29,10 @@ static int cdata_ioctl(struct inode *inode, struct file *filp,
 	{
 	  case IOCTL_EMPTY:
 	  printk(KERN_ALERT "in ioctl:IOCTL_EMPTY\n");
-	  break;
+	  return 0;
 	  case IOCTL_SYNC:
 	  printk(KERN_ALERT "in ioctl:IOCTL_SYNC\n");
-	  break;
+	  return 0;
 	  default:
           return -ENOTTY; 		
 	}
