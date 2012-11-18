@@ -6,6 +6,7 @@
 #include <linux/miscdevice.h>
 #include <linux/wait.h>
 #include <asm/io.h>
+#include "cdata_ioctl.h"
 
 #ifdef CONFIG_SMP
 #define __SMP__
@@ -31,7 +32,9 @@ static int cdata_ioctl(struct inode *inode, struct file *filp,
 	  break;
 	  case IOCTL_SYNC:
 	  printk(KERN_ALERT "in ioctl:IOCTL_SYNC\n");
-	  break;		
+	  break;
+	  default:
+          return -ENOTTY; 		
 	}
 }
 
