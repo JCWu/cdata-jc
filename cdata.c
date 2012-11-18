@@ -28,7 +28,7 @@ static int cdata_open(struct inode *inode, struct file *filp)
 
 	struct cdata_t *cdata;
 
-	cdata =  kmalloc(sizeof(struct cdata_t), GFP_KERNEL);
+	cdata =  (struct cdata_t *)kmalloc(sizeof(struct cdata_t), GFP_KERNEL);
 	cdata->index = 0;
 	filp->private_data = (void *)cdata;
 	return 0;
@@ -40,7 +40,6 @@ static int cdata_ioctl(struct inode *inode, struct file *filp,
 	printk(KERN_ALERT "cdata: in cdata_ioctl()\n");
 	switch(cmd)
 	{
-	  int i;
 	  case IOCTL_EMPTY:
 	  printk(KERN_ALERT "in ioctl:IOCTL_EMPTY\n");
 
@@ -68,10 +67,11 @@ static ssize_t cdata_write(struct file *filp, const char *buf,
 	struct cdata_t *cdata = (struct cdata_t *)filp->private_data;
 
 	for(i = 0; i < count; i++) {
-	  if(cdata->index >= BUFSIZE)
-		return -EFAULT;
+	  if(cdata->index >= BUFSIZE)					//If open(p1 and p2 get the same fd) then write it could be reentrancy 
+									//else will not reentrancy for mulitprocesses(SMP).
+		return -EFAULT;						//If single process it will not cause eentrancy problem. 
 
-  	  if(copy_from_user(&cdata->data[cdata->index++], &buf[i], 1)) //Write data from user space to kernel space.
+  	  if(copy_from_user(&cdata->data[cdata->index++], &buf[i], 1))  //Write data from user space to kernel space.
 		return -EFAULT;
 	}
 	return 0;
